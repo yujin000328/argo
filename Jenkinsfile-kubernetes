@@ -49,16 +49,14 @@ branch: 'main', url: '<URL>'
     stage('Build') { 
       steps { 
         container('maven') { 
-          sh 
-'mvn clean package -DskipTests=true' 
+          sh 'mvn clean package -DskipTests=true' 
         } 
       } 
     } 
     stage('Test') { 
       steps { 
         container('maven') { 
-          sh 
-'mvn test' 
+          sh 'mvn test' 
         } 
       } 
     } 
