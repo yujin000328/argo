@@ -10,7 +10,7 @@ spec:
     image: maven:3-openjdk-17 
     command: 
     - sleep 
-    args: 
+    args:
     - infinity 
   - name: git 
     image: alpine/git 
@@ -41,8 +41,7 @@ spec:
     stage('Checkout') { 
       steps { 
         container('maven') { 
-          git 
-branch: 'main', url: '<URL>' 
+          git branch: 'main', url: 'https://github.com/yujin000328/argo.git' 
         } 
       } 
     } 
