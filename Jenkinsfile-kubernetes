@@ -62,7 +62,7 @@ spec:
     stage('Build & Tag & Push Docker Image') { 
       steps { 
         container('kaniko') { 
-          sh 'executor --dockerfile=Dockerfile -context=dir:///home/jenkins/agent/workspace/kube_pipeline/ --destination=
+          sh 'executor --dockerfile=Dockerfile --context=dir:///home/jenkins/agent/workspace/kube_pipeline/ --destination=
  httpd:$BUILD_NUMBER --destination=httpd:latest' 
         }    
       } 
