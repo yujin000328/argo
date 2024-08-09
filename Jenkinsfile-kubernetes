@@ -1,4 +1,4 @@
- pipeline { 
+pipeline { 
   agent { 
     kubernetes { 
       yaml ''' 
@@ -10,7 +10,7 @@ spec:
     image: maven:3-openjdk-17 
     command: 
     - sleep 
-    args:
+    args: 
     - infinity 
   - name: git 
     image: alpine/git 
@@ -37,6 +37,7 @@ spec:
 ''' 
     } 
   } 
+  
   stages { 
     stage('Checkout') { 
       steps { 
@@ -45,6 +46,7 @@ spec:
         } 
       } 
     } 
+    
     stage('Build') { 
       steps { 
         container('maven') { 
@@ -52,6 +54,7 @@ spec:
         } 
       } 
     } 
+    
     stage('Test') { 
       steps { 
         container('maven') { 
@@ -59,30 +62,32 @@ spec:
         } 
       } 
     } 
+    
     stage('Build & Tag & Push Docker Image') { 
       steps { 
         container('kaniko') { 
-          sh 'executor --dockerfile=Dockerfile --context=dir:///home/jenkins/agent/workspace/kube_pipeline/ --destination=
- httpd:$BUILD_NUMBER --destination=httpd:latest' 
-        }    
+          sh 'executor --dockerfile=Dockerfile --context=dir:///home/jenkins/agent/workspace/kube_pipeline/ --destination=httpd:$BUILD_NUMBER --destination=httpd:latest' 
+        } 
       } 
     } 
+    
     stage('Update K8s Manifests & Push') { 
       environment { 
-        githubUser = 'yujin000328' //Ryan Jang 
-        githubEmail = 'dammoladbwls@gmail.com' //c1t1d0s7@example.com 
-        githubId = 'yujin000328' //c1t1d0s7  
-        githubRepo = 'argo' //jenkins-kube-deploy 
+        githubUser = 'yujin000328' 
+        githubEmail = 'dammoladbwls@gmail.com' 
+        githubId = 'yujin000328' 
+        githubRepo = 'argo' 
         githubURL = "https://github.com/${githubId}/${githubRepo}.git" 
-        dockerhubId = 'yujin0328' //c1t1d0s7 
-        dockerhubRepo = 'hello-world' //hello-world 
+        dockerhubId = 'yujin0328' 
+        dockerhubRepo = 'hello-world' 
       } 
+      
       steps { 
         container('git') { 
           git branch: 'main', credentialsId: 'github-credential', url: "${githubURL}" 
-          sh "git config --global --add safe.directory ${workspace}" 
-          sh "git config --global user.name ${githubUser}" 
-          sh "git config --global user.email ${githubEmail}" 
+          sh "git config --global --add safe.directory ${WORKSPACE}" 
+          sh "git config --global user.name '${githubUser}'" 
+          sh "git config --global user.email '${githubEmail}'" 
           sh 'sed -i "s/image:.*/image: ${dockerhubId}\\/${dockerhubRepo}:${BUILD_NUMBER}/g" deployment.yaml' 
           sh 'git add deployment.yaml' 
           sh 'git commit -m "Jenkins Build Number - ${BUILD_NUMBER}"' 
